@@ -536,7 +536,7 @@ document.querySelectorAll(".langtoggle button").forEach(function (b) {
   b.onclick = function () {
     state.lang = b.dataset.lang;
     saveLocal();
-    renderChrome(); renderDay(); renderAuth();
+    renderChrome(); renderAuth(); showView(state.view);
   };
 });
 
