@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blended Family Devotional | Devocional para la Familia</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=4">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -103,7 +103,8 @@
 
 <canvas id="shareCanvas" width="1080" height="1920" style="display:none"></canvas>
 
-<script src="devotionals.js"></script>
-<script src="app.js"></script>
+<!-- bump ?v= on every deploy so phones fetch fresh files instead of cached copies -->
+<script src="devotionals.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
