@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blended Family Devotional | Devocional para la Familia</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="kicker">Blended Family Devotional</div>
+    <h1 class="hand">Devocional para la Familia</h1>
+    <div class="sub">365 days · 365 días · English + Español</div>
+    <div class="langtoggle" role="group" aria-label="Language / Idioma">
+      <button data-lang="es">ES</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="both" class="active">Ambos</button>
+    </div>
+    <div class="autharea" id="authArea"></div>
+    <div class="streak" id="streakLine"></div>
+  </header>
+
+  <main>
+    <section id="view-today" class="view">
+      <div class="day-card">
+        <div class="day-row">
+          <div class="day-num hand" id="dayNum"></div>
+          <div class="tag" id="themePill"></div>
+        </div>
+        <h2 id="devTitle"></h2>
+        <div id="verseBlocks"></div>
+        <div class="body-text" id="devBody"></div>
+        <div class="reflect">
+          <strong id="reflectHeading">Reflect · Reflexiona</strong>
+          <p id="reflectText"></p>
+        </div>
+        <div class="prayer">
+          <strong id="prayerHeading">Prayer · Oración</strong>
+          <p id="prayerText"></p>
+        </div>
+        <div class="notesbox">
+          <strong id="notesHeading">My notes · Mis notas</strong>
+          <p class="notespriv" id="notesPriv">Private to you. Privadas.</p>
+          <textarea id="notesArea" rows="4" aria-label="My notes"></textarea>
+          <p class="saved-note" id="noteSaved"></p>
+        </div>
+        <div class="actions">
+          <button class="btn-complete" id="completeBtn">Mark complete · Completado</button>
+          <button class="btn-icon" id="favBtn" aria-label="Favorite">♡</button>
+          <button class="btn-icon" id="shareBtn" aria-label="Share">↗</button>
+        </div>
+        <div class="daynav">
+          <button id="prevBtn" class="daynavbtn">‹</button>
+          <button id="nextBtn" class="daynavbtn">›</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-months" class="view hidden">
+      <div id="monthBlocks"></div>
+    </section>
+
+    <section id="view-saved" class="view hidden">
+      <h2 class="viewtitle" id="savedHeading">Saved · Guardados</h2>
+      <div id="favList" class="results"></div>
+    </section>
+
+    <section id="view-notes" class="view hidden">
+      <h2 class="viewtitle" id="notesViewHeading">Notes · Notas</h2>
+      <div id="notesList" class="results"></div>
+    </section>
+
+    <section id="view-search" class="view hidden">
+      <h2 class="viewtitle" id="searchHeading">Search · Buscar</h2>
+      <input type="search" id="searchInput" placeholder="Search themes or titles..." aria-label="Search devotionals">
+      <div id="searchResults" class="results"></div>
+    </section>
+  </main>
+
+  <nav class="bottomnav">
+    <button data-view="today" class="active"><span class="ico">☀</span><span id="navToday">Today</span></button>
+    <button data-view="months"><span class="ico">📅</span><span id="navMonths">Months</span></button>
+    <button data-view="saved"><span class="ico">♡</span><span id="navSaved">Saved</span></button>
+    <button data-view="notes"><span class="ico">✎</span><span id="navNotes">Notes</span></button>
+    <button data-view="search"><span class="ico">🔍</span><span id="navSearch">Search</span></button>
+  </nav>
+</div>
+
+<div id="authModal" class="modal hidden">
+  <div class="modalcard">
+    <h2 id="authTitle">Sign in · Entrar</h2>
+    <p id="authDesc">Enter your email and we will send you a sign-in link. No password to remember. Your progress, favorites, and notes sync across your devices. / Escribe tu correo y te enviaremos un enlace para entrar. Sin contraseña que recordar. Tu progreso, favoritos y notas se sincronizan en tus dispositivos.</p>
+    <input type="email" id="authEmail" placeholder="you@example.com" aria-label="Email address">
+    <button id="authSend" class="btn-complete">Send sign-in link · Enviar enlace</button>
+    <p id="authMsg" class="authmsg"></p>
+    <button id="authClose" class="btn-icon wide">Close · Cerrar</button>
+  </div>
+</div>
+
+<canvas id="shareCanvas" width="1080" height="1920" style="display:none"></canvas>
+
+<script src="devotionals.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

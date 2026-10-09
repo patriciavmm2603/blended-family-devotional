@@ -1,0 +1,395 @@
+:root {
+  --wine: #5E1F2E;
+  --wine-soft: #f7eef0;
+  --ink: #2b2320;
+  --muted: #8a7a72;
+  --line: #e9ddd8;
+  --bg: #faf6f3;
+  --card: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.hand { font-family: "Caveat", cursive; }
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 90px;
+}
+
+.topbar {
+  text-align: center;
+  padding: 22px 20px 10px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.topbar h1 {
+  font-size: 34px;
+  color: var(--wine);
+  margin: 4px 0 2px;
+  line-height: 1.1;
+}
+
+.topbar .sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.langtoggle {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.langtoggle button {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--card);
+  cursor: pointer;
+}
+
+.langtoggle button.active {
+  background: var(--wine);
+  color: #fff;
+  border-color: var(--wine);
+}
+
+.autharea {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 18px;
+}
+
+.autharea button {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--wine);
+  cursor: pointer;
+}
+
+.autharea .who { display: inline-flex; align-items: center; gap: 6px; }
+.autharea .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4C8C4A; display: inline-block;
+}
+
+.streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  font-size: 14px;
+  color: var(--wine);
+  font-weight: 600;
+  min-height: 20px;
+}
+.streak small { color: var(--muted); font-weight: 400; }
+
+main { padding: 14px 14px 0; }
+
+.view.hidden { display: none; }
+
+.day-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 22px 20px;
+  border: 1px solid var(--line);
+}
+
+.day-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.day-num {
+  font-size: 26px;
+  color: var(--wine);
+  font-weight: 700;
+}
+
+.tag {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--wine);
+  background: var(--wine-soft);
+  padding: 5px 10px;
+  border-radius: 999px;
+  text-align: right;
+}
+
+.day-card h2 {
+  font-size: 22px;
+  margin: 2px 0 4px;
+  line-height: 1.25;
+}
+
+.day-card h2 .es {
+  display: block;
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.verse {
+  border-left: 3px solid var(--wine);
+  padding: 10px 0 10px 14px;
+  margin: 14px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.verse .ref {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.body-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #3d3330;
+}
+.body-text p + p { margin-top: 10px; }
+
+.reflect, .prayer, .notesbox {
+  margin-top: 14px;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.reflect { background: #fdf8ef; border: 1px solid #f0e2c4; }
+.prayer { background: var(--wine-soft); border: 1px solid #e8d3d8; font-style: italic; }
+.notesbox { background: var(--card); border: 1px dashed var(--line); }
+
+.reflect strong, .prayer strong, .notesbox strong {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--wine);
+  margin-bottom: 6px;
+}
+
+.notespriv { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+
+.notesbox textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.55;
+  resize: vertical;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.notesbox textarea:focus { outline: 2px solid var(--wine); border-color: var(--wine); }
+
+.saved-note { font-size: 11px; color: var(--muted); margin-top: 6px; min-height: 14px; }
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-complete {
+  flex: 1;
+  background: var(--wine);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-complete.done { background: #4C8C4A; }
+
+.btn-icon {
+  width: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  font-size: 20px;
+  color: var(--wine);
+  cursor: pointer;
+}
+
+.btn-icon.faved { background: var(--wine-soft); border-color: var(--wine); }
+.btn-icon.wide { width: 100%; margin-top: 10px; font-size: 14px; padding: 10px; }
+
+.daynav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.daynavbtn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 10px;
+  width: 48px;
+  height: 40px;
+  font-size: 20px;
+  color: var(--wine);
+  cursor: pointer;
+}
+.daynavbtn:disabled { opacity: 0.3; }
+
+.month-block {
+  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.month-block h3 {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.month-block h3 b { color: var(--wine); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.grid button {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.grid button.done { background: var(--wine); color: #fff; }
+.grid button.today { border: 2px solid var(--wine); color: var(--wine); font-weight: 700; background: #fff; }
+
+.viewtitle {
+  font-size: 20px;
+  color: var(--wine);
+  margin: 6px 2px 12px;
+}
+
+.results .result {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  color: var(--ink);
+}
+.results .result small { color: var(--muted); display: block; font-size: 12px; margin-top: 2px; }
+.results .result .snippet { font-size: 13px; color: var(--muted); margin-top: 4px; display: block; }
+
+.empty { color: var(--muted); padding: 20px 0; text-align: center; font-size: 14px; }
+
+#searchInput, #authEmail {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 15px;
+  margin: 10px 0 14px;
+  background: var(--card);
+}
+
+.bottomnav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  padding: 8px 4px 16px;
+  z-index: 20;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.bottomnav button {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px;
+}
+.bottomnav button.on { color: var(--wine); font-weight: 700; }
+.bottomnav .ico { font-size: 20px; display: block; margin-bottom: 2px; }
+
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(43, 35, 32, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 50;
+}
+.modal.hidden { display: none; }
+
+.modalcard {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+}
+.modalcard h2 { color: var(--wine); font-size: 20px; margin-bottom: 8px; }
+.modalcard p { font-size: 14px; margin-bottom: 10px; }
+.modalcard .btn-complete { width: 100%; margin-top: 6px; }
+.authmsg { font-size: 13px; color: var(--wine); min-height: 18px; margin-top: 8px; }
