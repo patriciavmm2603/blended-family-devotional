@@ -1,29 +1,32 @@
 -- Blended Family Devotional: Supabase schema
 -- Run this once in the Supabase dashboard: SQL Editor > New query > paste > Run.
+-- Two journeys (mom's personal reading + family reading), each with a full year.
 -- This creates three small tables for one user's progress, favorites, and private notes.
 -- It does NOT touch any existing tables. Safe to run as-is.
 
 create table if not exists public.devotional_progress (
   user_id uuid not null references auth.users (id) on delete cascade,
+  journey text not null default 'mom' check (journey in ('mom', 'family')),
   day int not null check (day between 1 and 365),
-  role text not null default 'mom' check (role in ('mom', 'dad', 'family')),
   completed_at timestamptz not null default now(),
-  primary key (user_id, day, role)
+  primary key (user_id, journey, day)
 );
 
 create table if not exists public.devotional_favorites (
   user_id uuid not null references auth.users (id) on delete cascade,
+  journey text not null default 'mom' check (journey in ('mom', 'family')),
   day int not null check (day between 1 and 365),
   created_at timestamptz not null default now(),
-  primary key (user_id, day)
+  primary key (user_id, journey, day)
 );
 
 create table if not exists public.devotional_notes (
   user_id uuid not null references auth.users (id) on delete cascade,
+  journey text not null default 'mom' check (journey in ('mom', 'family')),
   day int not null check (day between 1 and 365),
   note_text text not null,
   updated_at timestamptz not null default now(),
-  primary key (user_id, day)
+  primary key (user_id, journey, day)
 );
 
 alter table public.devotional_progress enable row level security;

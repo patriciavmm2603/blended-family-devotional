@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blended Family Devotional | Devocional para la Familia</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -19,6 +19,10 @@
       <button data-lang="es">ES</button>
       <button data-lang="en">EN</button>
       <button data-lang="both" class="active">Ambos</button>
+    </div>
+    <div class="journeytoggle" role="group" aria-label="Journey">
+      <button data-journey="mom" class="active" id="journeyMomBtn">For me</button>
+      <button data-journey="family" id="journeyFamilyBtn">For family</button>
     </div>
     <div class="autharea" id="authArea"></div>
     <div class="streak" id="streakLine"></div>
@@ -49,11 +53,7 @@
           <p class="saved-note" id="noteSaved"></p>
         </div>
         <div class="actions">
-          <div class="rolebtns">
-            <button class="btn-role" id="doneMom" aria-label="Mom"></button>
-            <button class="btn-role" id="doneDad" aria-label="Dad"></button>
-            <button class="btn-role" id="doneFamily" aria-label="Family"></button>
-          </div>
+          <button class="btn-complete" id="completeBtn">Mark complete</button>
           <button class="btn-icon" id="favBtn" aria-label="Favorite">♡</button>
           <button class="btn-icon" id="shareBtn" aria-label="Share">↗</button>
         </div>
@@ -108,7 +108,6 @@
 <canvas id="shareCanvas" width="1080" height="1920" style="display:none"></canvas>
 
 <!-- bump ?v= on every deploy so phones fetch fresh files instead of cached copies -->
-<script src="devotionals.js?v=5"></script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
