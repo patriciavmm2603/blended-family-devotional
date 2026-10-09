@@ -25,35 +25,47 @@ var MONTHS = [
 var STR = {
   en: {
     navToday: "Today", navMonths: "Months", navSaved: "Saved", navNotes: "Notes", navSearch: "Search",
-    dayNum: "Day", diaNum: "Día",
-    reflect: "Reflect · Reflexiona", prayer: "Prayer · Oración",
-    notesH: "My notes · Mis notas", notesPriv: "Private to you. Privadas.",
+    bothBtn: "Both", langLabel: "Language",
+    appTitle: "Blended Family Devotional", appSub: "365 days",
+    dayNum: "Day",
+    reflect: "Reflect", prayer: "Prayer",
+    notesH: "My notes", notesPriv: "Private to you.",
     notesPh: "Write your thoughts, prayers, or what God showed you today...",
     noteSaved: "Saved ✓",
-    markComplete: "Mark complete · Completado", completed: "Completed ✓ · Completado ✓",
+    markComplete: "Mark complete", completed: "Completed ✓",
     searchPh: "Search themes or titles...",
     noResults: "No matches. Try another word.",
     noFavs: "No saved days yet. Tap the heart on any day to save it here.",
     noNotes: "No notes yet. Write in the notes box on any day and it will appear here.",
-    streak1: "day streak · día de racha", streakN: "day streak · días de racha",
-    signIn: "Sign in · Entrar", signOut: "Sign out · Salir",
-    month: "Month"
+    savedH: "Saved", notesVH: "Notes", searchH: "Search",
+    streak1: "day streak", streakN: "day streak",
+    signIn: "Sign in", signOut: "Sign out",
+    authTitle: "Sign in",
+    authDesc: "Enter your email and we will send you a sign-in link. No password to remember. Your progress, favorites, and notes sync across your devices.",
+    authSend: "Send sign-in link", authClose: "Close",
+    month: "Month", shareBrand: "Blended Family Devotional"
   },
   es: {
     navToday: "Hoy", navMonths: "Meses", navSaved: "Guardados", navNotes: "Notas", navSearch: "Buscar",
-    dayNum: "Día", diaNum: "Day",
-    reflect: "Reflexiona · Reflect", prayer: "Oración · Prayer",
-    notesH: "Mis notas · My notes", notesPriv: "Privadas. Private to you.",
+    bothBtn: "Ambos", langLabel: "Idioma",
+    appTitle: "Devocional para la Familia", appSub: "365 días",
+    dayNum: "Día",
+    reflect: "Reflexiona", prayer: "Oración",
+    notesH: "Mis notas", notesPriv: "Privadas.",
     notesPh: "Escribe tus pensamientos, oraciones, o lo que Dios te mostró hoy...",
     noteSaved: "Guardado ✓",
-    markComplete: "Completado · Mark complete", completed: "Completado ✓ · Completed ✓",
+    markComplete: "Completar", completed: "Completado ✓",
     searchPh: "Busca temas o títulos...",
     noResults: "Sin resultados. Prueba otra palabra.",
     noFavs: "Aún no guardas días. Toca el corazón en cualquier día para guardarlo aquí.",
     noNotes: "Aún no tienes notas. Escribe en la caja de notas de cualquier día y aparecerá aquí.",
-    streak1: "día de racha · day streak", streakN: "días de racha · day streak",
-    signIn: "Entrar · Sign in", signOut: "Salir · Sign out",
-    month: "Mes"
+    savedH: "Guardados", notesVH: "Notas", searchH: "Buscar",
+    streak1: "día de racha", streakN: "días de racha",
+    signIn: "Entrar", signOut: "Salir",
+    authTitle: "Entrar",
+    authDesc: "Escribe tu correo y te enviaremos un enlace para entrar. Sin contraseña que recordar. Tu progreso, favoritos y notas se sincronizan en tus dispositivos.",
+    authSend: "Enviar enlace", authClose: "Cerrar",
+    month: "Mes", shareBrand: "Devocional para la Familia"
   }
 };
 
@@ -124,6 +136,7 @@ function monthOf(day) {
 /* ---------- rendering ---------- */
 
 function renderChrome() {
+  var both = state.lang === "both";
   $("navToday").textContent = t("navToday");
   $("navMonths").textContent = t("navMonths");
   $("navSaved").textContent = t("navSaved");
@@ -134,7 +147,25 @@ function renderChrome() {
   $("notesHeading").textContent = t("notesH");
   $("notesPriv").textContent = t("notesPriv");
   $("notesArea").placeholder = t("notesPh");
+  $("notesArea").setAttribute("aria-label", t("notesH"));
   $("searchInput").placeholder = t("searchPh");
+  $("searchInput").setAttribute("aria-label", t("searchH"));
+  $("savedHeading").textContent = t("savedH");
+  $("notesViewHeading").textContent = t("notesVH");
+  $("searchHeading").textContent = t("searchH");
+  $("authTitle").textContent = t("authTitle");
+  $("authDesc").textContent = t("authDesc");
+  $("authSend").textContent = t("authSend");
+  $("authClose").textContent = t("authClose");
+  var bothBtn = document.querySelector('.langtoggle button[data-lang="both"]');
+  if (bothBtn) bothBtn.textContent = t("bothBtn");
+  document.querySelector(".langtoggle").setAttribute("aria-label", t("langLabel"));
+  // header: bilingual lockup in "both" mode, single language otherwise
+  $("appKicker").style.display = both ? "" : "none";
+  $("appTitle").textContent = both ? "Devocional para la Familia" : t("appTitle");
+  $("appSub").textContent = both ? "365 days · 365 días · English + Español" : t("appSub");
+  document.title = both ? "Blended Family Devotional | Devocional para la Familia" : t("appTitle");
+  document.documentElement.lang = state.lang === "es" ? "es" : "en";
   document.querySelectorAll(".langtoggle button").forEach(function (b) {
     b.classList.toggle("active", b.dataset.lang === state.lang);
   });
@@ -162,7 +193,7 @@ function renderDay() {
   if (!d) { $("devTitle").textContent = "Loading..."; return; }
   var both = state.lang === "both";
 
-  $("dayNum").textContent = t("dayNum") + " " + d.day + " · " + t("diaNum") + " " + d.day;
+  $("dayNum").textContent = t("dayNum") + " " + d.day;
   $("themePill").textContent = both ? d.theme_en + " · " + d.theme_es : pick(d, "theme");
 
   if (both) {
@@ -224,9 +255,13 @@ function renderMonths() {
     var block = document.createElement("div");
     block.className = "month-block";
     var h = document.createElement("h3");
-    var mLabel = state.lang === "es" ? "Mes" : "Month";
-    h.innerHTML = "<b>" + mLabel + " " + (mi + 1) + "</b> · " +
-      esc(state.lang === "es" ? m.es : m.en);
+    if (state.lang === "both") {
+      h.innerHTML = "<b>Month · Mes " + (mi + 1) + "</b> · " +
+        esc(m.en) + " · " + esc(m.es);
+    } else {
+      h.innerHTML = "<b>" + t("month") + " " + (mi + 1) + "</b> · " +
+        esc(state.lang === "es" ? m.es : m.en);
+    }
     block.appendChild(h);
     var grid = document.createElement("div");
     grid.className = "grid";
@@ -298,7 +333,7 @@ function renderSearch(q) {
   hits.slice(0, 60).forEach(function (d) {
     var b = document.createElement("button");
     b.className = "result";
-    b.innerHTML = "<strong>" + d.day + ". " + esc(d.title_en) + "</strong><small>" + esc(d.theme_en) + " · " + esc(d.theme_es) + "</small>";
+    b.innerHTML = "<strong>" + d.day + ". " + esc(pick(d, "title")) + "</strong><small>" + esc(pick(d, "theme")) + "</small>";
     b.onclick = function () { state.day = d.day; showView("today"); };
     box.appendChild(b);
   });
@@ -482,7 +517,10 @@ function shareCard() {
 
   ctx.fillStyle = "#5E1F2E";
   ctx.font = "600 44px Caveat, cursive";
-  ctx.fillText("Devocional para la Familia", W / 2, H - 130);
+  var brand = state.lang === "both"
+    ? "Blended Family Devotional · Devocional para la Familia"
+    : t("shareBrand");
+  ctx.fillText(brand, W / 2, H - 130);
 
   var a = document.createElement("a");
   a.download = "devotional-day-" + d.day + ".png";
