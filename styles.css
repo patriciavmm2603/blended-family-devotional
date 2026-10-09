@@ -246,6 +246,23 @@ main { padding: 14px 14px 0; }
 
 .btn-complete.done { background: #4C8C4A; }
 
+.rolebtns { display: flex; gap: 8px; flex: 1; }
+
+.btn-role {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--wine);
+  border-radius: 12px;
+  padding: 12px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-role.done { background: var(--wine); border-color: var(--wine); color: #fff; }
+
 .btn-icon {
   width: 48px;
   border-radius: 12px;
@@ -315,6 +332,7 @@ main { padding: 14px 14px 0; }
 }
 
 .grid button.done { background: var(--wine); color: #fff; }
+.grid button.partial { background: var(--wine-soft); color: var(--wine); }
 .grid button.today { border: 2px solid var(--wine); color: var(--wine); font-weight: 700; background: #fff; }
 
 .viewtitle {

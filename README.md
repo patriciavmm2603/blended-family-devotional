@@ -29,10 +29,15 @@ Bilingual (EN/ES) year-long devotional web app for blended families. Static site
 
 ## What Pat needs to do
 
-1. **Run `schema.sql`** in the Supabase dashboard (SQL Editor > New query > paste > Run). It only creates three new tables; it does not touch anything existing.
-2. **Allow the site URL for magic-link redirects:** Supabase dashboard > Authentication > URL Configuration > add the GitHub Pages URL to Redirect URLs.
-3. **Deploy:** push this folder to a GitHub repo and enable GitHub Pages (Settings > Pages > Deploy from branch).
-4. **Test the login** with her own email before sharing the link.
+1. **Run `schema.sql`** in the Supabase dashboard (SQL Editor > New query > paste > Run) — only if she has not run it before. It only creates three new tables; it does not touch anything existing.
+2. **If she already ran the original schema:** run `migration-roles.sql` instead (same steps). It adds a `role` column (mom/dad/family) to `devotional_progress` so each day tracks Mom, Dad, and Family separately. Existing checkmarks become Mom's.
+3. **Allow the site URL for magic-link redirects:** Supabase dashboard > Authentication > URL Configuration > add the GitHub Pages URL to Redirect URLs.
+4. **Deploy:** push this folder to a GitHub repo and enable GitHub Pages (Settings > Pages > Deploy from branch).
+5. **Test the login** with her own email before sharing the link.
+
+## Reading roles
+
+Each day has three check-in buttons: Mom, Dad, Family. Each role has its own completion set and its own streak, shown in the header. The month grid shows a day fully filled when all three roles completed it, softly filled when only some did, and hovering a day lists which roles checked in. Progress syncs per role when signed in; works fully offline otherwise.
 
 ## Notes
 

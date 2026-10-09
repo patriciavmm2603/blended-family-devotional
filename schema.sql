@@ -6,8 +6,9 @@
 create table if not exists public.devotional_progress (
   user_id uuid not null references auth.users (id) on delete cascade,
   day int not null check (day between 1 and 365),
+  role text not null default 'mom' check (role in ('mom', 'dad', 'family')),
   completed_at timestamptz not null default now(),
-  primary key (user_id, day)
+  primary key (user_id, day, role)
 );
 
 create table if not exists public.devotional_favorites (

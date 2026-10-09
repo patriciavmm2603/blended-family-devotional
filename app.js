@@ -32,7 +32,7 @@ var STR = {
     notesH: "My notes", notesPriv: "Private to you.",
     notesPh: "Write your thoughts, prayers, or what God showed you today...",
     noteSaved: "Saved ✓",
-    markComplete: "Mark complete", completed: "Completed ✓",
+    roleMom: "Mom", roleDad: "Dad", roleFamily: "Family",
     searchPh: "Search themes or titles...",
     noResults: "No matches. Try another word.",
     noFavs: "No saved days yet. Tap the heart on any day to save it here.",
@@ -54,7 +54,7 @@ var STR = {
     notesH: "Mis notas", notesPriv: "Privadas.",
     notesPh: "Escribe tus pensamientos, oraciones, o lo que Dios te mostró hoy...",
     noteSaved: "Guardado ✓",
-    markComplete: "Completar", completed: "Completado ✓",
+    roleMom: "Mamá", roleDad: "Papá", roleFamily: "Familia",
     searchPh: "Busca temas o títulos...",
     noResults: "Sin resultados. Prueba otra palabra.",
     noFavs: "Aún no guardas días. Toca el corazón en cualquier día para guardarlo aquí.",
@@ -94,7 +94,18 @@ function saveLocal() {
 }
 
 function loadLocal() {
-  try { state.done = JSON.parse(localStorage.getItem("bfd_done") || "{}"); } catch (e) { state.done = {}; }
+  try {
+    var raw = JSON.parse(localStorage.getItem("bfd_done") || "null");
+    state.done = { mom: {}, dad: {}, family: {} };
+    if (raw) {
+      if (raw.mom || raw.dad || raw.family) {
+        ["mom", "dad", "family"].forEach(function (r) { if (raw[r]) state.done[r] = raw[r]; });
+      } else {
+        // legacy single-button format: those checkmarks become Mom's
+        state.done.mom = raw;
+      }
+    }
+  } catch (e) { state.done = { mom: {}, dad: {}, family: {} }; }
   try { state.fav = JSON.parse(localStorage.getItem("bfd_fav") || "{}"); } catch (e) { state.fav = {}; }
   try { state.notes = JSON.parse(localStorage.getItem("bfd_notes") || "{}"); } catch (e) { state.notes = {}; }
   try { state.notesMeta = JSON.parse(localStorage.getItem("bfd_notes_meta") || "{}"); } catch (e) { state.notesMeta = {}; }
@@ -172,8 +183,8 @@ function renderChrome() {
   renderStreak();
 }
 
-function renderStreak() {
-  var days = Object.keys(state.done).map(Number).sort(function (a, b) { return a - b; });
+function streakFor(set) {
+  var days = Object.keys(set || {}).map(Number).sort(function (a, b) { return a - b; });
   var streak = 0;
   if (days.length) {
     var cur = days[days.length - 1];
@@ -183,9 +194,16 @@ function renderStreak() {
       else break;
     }
   }
-  $("streakLine").innerHTML = streak > 0
-    ? "🔥 " + streak + " <small>" + (streak === 1 ? t("streak1") : t("streakN")) + "</small>"
-    : "";
+  return streak;
+}
+
+function renderStreak() {
+  var parts = [
+    t("roleMom") + " 🔥" + streakFor(state.done.mom),
+    t("roleDad") + " 🔥" + streakFor(state.done.dad),
+    t("roleFamily") + " 🔥" + streakFor(state.done.family)
+  ];
+  $("streakLine").textContent = parts.join(" · ");
 }
 
 function renderDay() {
@@ -235,10 +253,13 @@ function renderDay() {
   na.value = state.notes[d.day] || "";
   $("noteSaved").textContent = "";
 
-  var done = !!state.done[d.day];
-  var cb = $("completeBtn");
-  cb.textContent = done ? t("completed") : t("markComplete");
-  cb.classList.toggle("done", done);
+  [["mom", "doneMom", "roleMom"], ["dad", "doneDad", "roleDad"], ["family", "doneFamily", "roleFamily"]].forEach(function (r) {
+    var btn = $(r[1]);
+    var isDone = !!(state.done[r[0]] && state.done[r[0]][d.day]);
+    btn.textContent = t(r[2]) + (isDone ? " ✓" : "");
+    btn.setAttribute("aria-label", t(r[2]));
+    btn.classList.toggle("done", isDone);
+  });
 
   var fb = $("favBtn");
   fb.textContent = state.fav[d.day] ? "♥" : "♡";
@@ -269,10 +290,21 @@ function renderMonths() {
       (function (dn) {
         var b = document.createElement("button");
         b.textContent = dn;
-        if (state.done[dn]) b.classList.add("done");
+        var rolesDone = ["mom", "dad", "family"].filter(function (r) {
+          return state.done[r] && state.done[r][dn];
+        });
+        if (rolesDone.length === 3) b.classList.add("done");
+        else if (rolesDone.length) b.classList.add("partial");
         if (dn === state.day) b.classList.add("today");
         var d = dev(dn);
-        b.title = d ? pick(d, "title") : "";
+        var label = d ? pick(d, "title") : "";
+        if (rolesDone.length) {
+          var names = rolesDone.map(function (r) {
+            return t("role" + r.charAt(0).toUpperCase() + r.slice(1));
+          }).join(" ✓, ") + " ✓";
+          label += " (" + names + ")";
+        }
+        b.title = label;
         b.onclick = function () { state.day = dn; showView("today"); };
         grid.appendChild(b);
       })(day);
@@ -359,10 +391,14 @@ function showView(v) {
 async function cloudPull() {
   if (!sb || !state.user) return;
   try {
-    var p = await sb.from("devotional_progress").select("day");
+    var p = await sb.from("devotional_progress").select("day, role");
     var f = await sb.from("devotional_favorites").select("day");
     var n = await sb.from("devotional_notes").select("day, note_text, updated_at");
-    (p.data || []).forEach(function (r) { state.done[r.day] = true; });
+    (p.data || []).forEach(function (r) {
+      var role = r.role || "mom";
+      if (!state.done[role]) state.done[role] = {};
+      state.done[role][r.day] = true;
+    });
     (f.data || []).forEach(function (r) { state.fav[r.day] = true; });
     (n.data || []).forEach(function (r) {
       var ts = new Date(r.updated_at).getTime();
@@ -375,10 +411,16 @@ async function cloudPull() {
   } catch (e) { /* offline: keep local */ }
 }
 
-async function cloudPush(table, day, on) {
+async function cloudPush(table, day, on, role) {
   if (!sb || !state.user) return;
   try {
-    if (on) {
+    if (table === "devotional_progress") {
+      if (on) {
+        await sb.from(table).upsert({ user_id: state.user.id, day: day, role: role }, { onConflict: "user_id,day,role" });
+      } else {
+        await sb.from(table).delete().eq("user_id", state.user.id).eq("day", day).eq("role", role);
+      }
+    } else if (on) {
       await sb.from(table).upsert({ user_id: state.user.id, day: day }, { onConflict: "user_id,day" });
     } else {
       await sb.from(table).delete().eq("user_id", state.user.id).eq("day", day);
@@ -405,7 +447,12 @@ async function cloudPushNote(day) {
 
 async function cloudPushAll() {
   if (!sb || !state.user) return;
-  var rows = Object.keys(state.done).map(function (d) { return { user_id: state.user.id, day: Number(d) }; });
+  var rows = [];
+  ["mom", "dad", "family"].forEach(function (role) {
+    Object.keys(state.done[role] || {}).forEach(function (d) {
+      rows.push({ user_id: state.user.id, day: Number(d), role: role });
+    });
+  });
   var frows = Object.keys(state.fav).map(function (d) { return { user_id: state.user.id, day: Number(d) }; });
   var nrows = Object.keys(state.notes).filter(function (d) {
     return state.notes[d] && state.notes[d].trim();
@@ -413,7 +460,7 @@ async function cloudPushAll() {
     return { user_id: state.user.id, day: Number(d), note_text: state.notes[d].trim() };
   });
   try {
-    if (rows.length) await sb.from("devotional_progress").upsert(rows, { onConflict: "user_id,day" });
+    if (rows.length) await sb.from("devotional_progress").upsert(rows, { onConflict: "user_id,day,role" });
     if (frows.length) await sb.from("devotional_favorites").upsert(frows, { onConflict: "user_id,day" });
     if (nrows.length) await sb.from("devotional_notes").upsert(nrows, { onConflict: "user_id,day" });
   } catch (e) { /* offline */ }
@@ -547,12 +594,15 @@ document.querySelectorAll(".bottomnav button").forEach(function (b) {
 $("prevBtn").onclick = function () { if (state.day > 1) { state.day--; renderDay(); window.scrollTo(0, 0); } };
 $("nextBtn").onclick = function () { if (state.day < TOTAL_DAYS) { state.day++; renderDay(); window.scrollTo(0, 0); } };
 
-$("completeBtn").onclick = function () {
-  var day = state.day;
-  if (state.done[day]) delete state.done[day]; else state.done[day] = true;
-  saveLocal(); renderDay(); renderStreak();
-  cloudPush("devotional_progress", day, !!state.done[day]);
-};
+[["mom", "doneMom"], ["dad", "doneDad"], ["family", "doneFamily"]].forEach(function (r) {
+  $(r[1]).onclick = function () {
+    var day = state.day, role = r[0];
+    if (!state.done[role]) state.done[role] = {};
+    if (state.done[role][day]) delete state.done[role][day]; else state.done[role][day] = true;
+    saveLocal(); renderDay(); renderStreak();
+    cloudPush("devotional_progress", day, !!state.done[role][day], role);
+  };
+});
 
 $("favBtn").onclick = function () {
   var day = state.day;
