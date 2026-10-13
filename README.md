@@ -30,14 +30,14 @@ Bilingual (EN/ES) year-long devotional web app for blended families. Static site
 ## What Pat needs to do
 
 1. **Run `schema.sql`** in the Supabase dashboard (SQL Editor > New query > paste > Run) — only if she has not run it before. It only creates three new tables; it does not touch anything existing.
-2. **If she already ran an earlier schema:** run `migration-journeys.sql` instead (same steps). It adds a `journey` column (mom / family) to all three tables so progress, favorites, and notes track separately per journey. Existing rows become mom's journey. (Do NOT run the old `migration-roles.sql`; the role idea was replaced by journeys.)
+2. **If she already ran an earlier schema:** run `migration-journeys.sql` instead (same steps). It adds a `journey` column (mom / family / us) to all three tables so progress, favorites, and notes track separately per journey. Existing rows become mom's journey. (Do NOT run the old `migration-roles.sql`; the role idea was replaced by journeys.)
 3. **Allow the site URL for magic-link redirects:** Supabase dashboard > Authentication > URL Configuration > add the GitHub Pages URL to Redirect URLs.
 4. **Deploy:** push this folder to a GitHub repo and enable GitHub Pages (Settings > Pages > Deploy from branch).
 5. **Test the login** with her own email before sharing the link.
 
-## Two journeys
+## Three journeys
 
-The app opens on **For me** (mom's personal reading, 365 days). The toggle at the top switches to **For family** (365 read-aloud devotionals for the whole family). Each journey has its own year of content, its own progress, streak, favorites, and notes. Switching journeys loads that year's content on demand. Works fully offline; one shared login syncs both journeys across phones, or skip the login entirely.
+The app opens on **For me** (mom's personal reading, 365 days). The toggle at the top switches to **For family** (365 read-aloud devotionals for the whole family) and **For us** (365 devotionals for couples to read together, focused on marriage). Each journey has its own year of content, its own progress, streak, favorites, and notes. Switching journeys loads that year's content on demand. Works fully offline; one shared login syncs all journeys across phones, or skip the login entirely.
 
 ## Notes
 
