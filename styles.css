@@ -27,7 +27,7 @@ body {
 
 .topbar {
   text-align: center;
-  padding: 22px 20px 10px;
+  padding: calc(22px + env(safe-area-inset-top)) 20px 10px;
   background: var(--card);
   border-bottom: 1px solid var(--line);
 }
@@ -380,7 +380,7 @@ main { padding: 14px 14px 0; }
   display: flex;
   border-top: 1px solid var(--line);
   background: var(--card);
-  padding: 8px 4px 16px;
+  padding: 8px 4px calc(16px + env(safe-area-inset-bottom));
   z-index: 20;
   max-width: 480px;
   margin: 0 auto;
