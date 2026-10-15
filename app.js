@@ -33,7 +33,7 @@ var STR = {
     notesPh: "Write your thoughts, prayers, or what God showed you today...",
     noteSaved: "Saved ✓",
     markComplete: "Mark complete", completed: "Completed ✓",
-    journeyMom: "For me", journeyFamily: "For family", journeyUs: "For us",
+    journeyMom: "For me", journeyFamily: "For family",
     searchPh: "Search themes or titles...",
     noResults: "No matches. Try another word.",
     noFavs: "No saved days yet. Tap the heart on any day to save it here.",
@@ -56,7 +56,7 @@ var STR = {
     notesPh: "Escribe tus pensamientos, oraciones, o lo que Dios te mostró hoy...",
     noteSaved: "Guardado ✓",
     markComplete: "Completar", completed: "Completado ✓",
-    journeyMom: "Para mí", journeyFamily: "En familia", journeyUs: "Para nosotros",
+    journeyMom: "Para mí", journeyFamily: "En familia",
     searchPh: "Busca temas o títulos...",
     noResults: "Sin resultados. Prueba otra palabra.",
     noFavs: "Aún no guardas días. Toca el corazón en cualquier día para guardarlo aquí.",
@@ -97,16 +97,15 @@ function saveLocal() {
 }
 
 function loadLocal() {
-  // progress, favorites, and notes are keyed by journey: { mom: {...}, family: {...}, us: {...} }
+  // progress, favorites, and notes are keyed by journey: { mom: {...}, family: {...} }
   function byJourney(key) {
-    var out = { mom: {}, family: {}, us: {} };
+    var out = { mom: {}, family: {} };
     try {
       var raw = JSON.parse(localStorage.getItem(key) || "null");
       if (raw) {
-        if (raw.mom || raw.family || raw.us) {
+        if (raw.mom || raw.family) {
           if (raw.mom && typeof raw.mom === "object") out.mom = raw.mom;
           if (raw.family && typeof raw.family === "object") out.family = raw.family;
-          if (raw.us && typeof raw.us === "object") out.us = raw.us;
         } else if (raw.mom || raw.dad) {
           // short-lived role format: mom's checkmarks carry over
           if (raw.mom && typeof raw.mom === "object") out.mom = raw.mom;
@@ -144,21 +143,14 @@ function $(id) { return document.getElementById(id); }
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-/* journey content loads on demand: DEVOTIONALS_MOM / DEVOTIONALS_FAMILY / DEVOTIONALS_US */
-function journeyVar() { return state.journey === "family" ? "DEVOTIONALS_FAMILY" : state.journey === "us" ? "DEVOTIONALS_US" : "DEVOTIONALS_MOM"; }
-function journeyFile() { return state.journey === "family" ? "devotionals-family.js" : state.journey === "us" ? "devotionals-us.js" : "devotionals-mom.js"; }
-// Reveal the "For us" button only once its content file exists on the server.
-(function () {
-  var s = document.createElement("script");
-  s.src = "devotionals-us.js?v=1";
-  s.onload = function () { var b = document.getElementById("journeyUsBtn"); if (b) b.hidden = false; };
-  document.head.appendChild(s);
-})();
+/* journey content loads on demand: DEVOTIONALS_MOM / DEVOTIONALS_FAMILY */
+function journeyVar() { return state.journey === "family" ? "DEVOTIONALS_FAMILY" : "DEVOTIONALS_MOM"; }
+function journeyFile() { return state.journey === "family" ? "devotionals-family.js" : "devotionals-mom.js"; }
 function ensureJourneyLoaded() {
   return new Promise(function (resolve) {
     if (window[journeyVar()]) { resolve(); return; }
     var s = document.createElement("script");
-    s.src = journeyFile() + "?v=6";
+    s.src = journeyFile() + "?v=7";
     s.onload = function () { resolve(); };
     s.onerror = function () { resolve(); };
     document.head.appendChild(s);
@@ -213,7 +205,6 @@ function renderChrome() {
   document.querySelector(".langtoggle").setAttribute("aria-label", t("langLabel"));
   $("journeyMomBtn").textContent = t("journeyMom");
   $("journeyFamilyBtn").textContent = t("journeyFamily");
-  $("journeyUsBtn").textContent = t("journeyUs");
   document.querySelectorAll(".journeytoggle button").forEach(function (b) {
     b.classList.toggle("active", b.dataset.journey === state.journey);
   });
@@ -479,7 +470,7 @@ async function cloudPushNote(day) {
 async function cloudPushAll() {
   if (!sb || !state.user) return;
   var rows = [], frows = [], nrows = [];
-  ["mom", "family", "us"].forEach(function (j) {
+  ["mom", "family"].forEach(function (j) {
     Object.keys((state.done[j] || {})).forEach(function (d) {
       rows.push({ user_id: state.user.id, day: Number(d), journey: j });
     });
