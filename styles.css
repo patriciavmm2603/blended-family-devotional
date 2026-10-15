@@ -77,7 +77,6 @@ body {
 .journeytoggle {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
 }
@@ -385,6 +384,8 @@ main { padding: 14px 14px 0; }
   z-index: 20;
   max-width: 480px;
   margin: 0 auto;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .bottomnav button {
