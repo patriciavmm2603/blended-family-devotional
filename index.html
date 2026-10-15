@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Blended Family Devotional | Devocional para la Familia</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=1">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <meta name="theme-color" content="#5E1F2E">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -27,7 +27,6 @@
     <div class="journeytoggle" role="group" aria-label="Journey">
       <button data-journey="mom" class="active" id="journeyMomBtn">For me</button>
       <button data-journey="family" id="journeyFamilyBtn">For family</button>
-      <button data-journey="us" id="journeyUsBtn" hidden>For us</button>
     </div>
     <div class="autharea" id="authArea"></div>
     <div class="streak" id="streakLine"></div>
@@ -113,6 +112,6 @@
 <canvas id="shareCanvas" width="1080" height="1920" style="display:none"></canvas>
 
 <!-- bump ?v= on every deploy so phones fetch fresh files instead of cached copies -->
-<script src="app.js?v=7"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
