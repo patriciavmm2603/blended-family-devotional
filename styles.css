@@ -209,7 +209,7 @@ main { padding: 14px 14px 0; }
 }
 .body-text p + p { margin-top: 10px; }
 
-.reflect, .prayer, .notesbox {
+.reflect, .prayer, .notesbox, .reading {
   margin-top: 14px;
   border-radius: 12px;
   padding: 14px;
@@ -218,10 +218,12 @@ main { padding: 14px 14px 0; }
 }
 
 .reflect { background: #fdf8ef; border: 1px solid #f0e2c4; }
+.reading { background: #eef4ee; border: 1px solid #d3e0d3; }
+.hidden { display: none; }
 .prayer { background: var(--wine-soft); border: 1px solid #e8d3d8; font-style: italic; }
 .notesbox { background: var(--card); border: 1px dashed var(--line); }
 
-.reflect strong, .prayer strong, .notesbox strong {
+.reflect strong, .prayer strong, .notesbox strong, .reading strong {
   display: block;
   font-style: normal;
   font-size: 11px;

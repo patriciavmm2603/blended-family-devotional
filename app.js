@@ -7,6 +7,17 @@ var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 var TOTAL_DAYS = 365;
 
+/* Per-journey length: the three year journeys have 365 days, Joy in Him has 30. */
+var JOURNEY_TOTAL = { mom: 365, family: 365, us: 365, joy: 30 };
+function journeyTotal() { return JOURNEY_TOTAL[state.journey] || TOTAL_DAYS; }
+
+var JOY_WEEKS = [
+  { en: "Week 1 · Joy in His Presence", es: "Semana 1 · Gozo en Su presencia", start: 1, end: 7 },
+  { en: "Week 2 · Joy Restored", es: "Semana 2 · Gozo restaurado", start: 8, end: 14 },
+  { en: "Week 3 · Joy That Endures", es: "Semana 3 · Gozo que permanece", start: 15, end: 21 },
+  { en: "Week 4 · Joy Every Day", es: "Semana 4 · Gozo cada día", start: 22, end: 30 }
+];
+
 var MONTHS = [
   { en: "Foundations for the Blended Home", es: "Fundamentos para el Hogar Ensamblado", start: 1, end: 31 },
   { en: "Love and Patience", es: "Amor y Paciencia", start: 32, end: 61 },
@@ -33,7 +44,8 @@ var STR = {
     notesPh: "Write your thoughts, prayers, or what God showed you today...",
     noteSaved: "Saved ✓",
     markComplete: "Mark complete", completed: "Completed ✓",
-    journeyMom: "For me", journeyFamily: "For family",
+    journeyMom: "For me", journeyFamily: "For family", journeyUs: "For us", journeyJoy: "Joy in Him",
+    readMore: "Read in His Word", joySub: "30 days of joy in the Lord",
     searchPh: "Search themes or titles...",
     noResults: "No matches. Try another word.",
     noFavs: "No saved days yet. Tap the heart on any day to save it here.",
@@ -56,7 +68,8 @@ var STR = {
     notesPh: "Escribe tus pensamientos, oraciones, o lo que Dios te mostró hoy...",
     noteSaved: "Guardado ✓",
     markComplete: "Completar", completed: "Completado ✓",
-    journeyMom: "Para mí", journeyFamily: "En familia",
+    journeyMom: "Para mí", journeyFamily: "En familia", journeyUs: "Para nosotros", journeyJoy: "Gozo en Él",
+    readMore: "Lee en Su Palabra", joySub: "30 días de gozo en el Señor",
     searchPh: "Busca temas o títulos...",
     noResults: "Sin resultados. Prueba otra palabra.",
     noFavs: "Aún no guardas días. Toca el corazón en cualquier día para guardarlo aquí.",
@@ -80,6 +93,7 @@ var state = {
   lang: localStorage.getItem("bfd_lang") || "both",
   journey: localStorage.getItem("bfd_journey") || "mom",
   day: 1,
+  dayByJourney: {},
   done: {},
   fav: {},
   notes: {},
@@ -90,6 +104,8 @@ var state = {
 
 function saveLocal() {
   localStorage.setItem("bfd_lang", state.lang);
+  state.dayByJourney[state.journey] = state.day;
+  localStorage.setItem("bfd_day_by_journey", JSON.stringify(state.dayByJourney));
   localStorage.setItem("bfd_done", JSON.stringify(state.done));
   localStorage.setItem("bfd_fav", JSON.stringify(state.fav));
   localStorage.setItem("bfd_notes", JSON.stringify(state.notes));
@@ -97,15 +113,17 @@ function saveLocal() {
 }
 
 function loadLocal() {
-  // progress, favorites, and notes are keyed by journey: { mom: {...}, family: {...} }
+  // progress, favorites, and notes are keyed by journey: { mom: {...}, family: {...}, us: {...}, joy: {...} }
   function byJourney(key) {
-    var out = { mom: {}, family: {} };
+    var out = { mom: {}, family: {}, us: {}, joy: {} };
     try {
       var raw = JSON.parse(localStorage.getItem(key) || "null");
       if (raw) {
-        if (raw.mom || raw.family) {
+        if (raw.mom || raw.family || raw.us || raw.joy) {
           if (raw.mom && typeof raw.mom === "object") out.mom = raw.mom;
           if (raw.family && typeof raw.family === "object") out.family = raw.family;
+          if (raw.us && typeof raw.us === "object") out.us = raw.us;
+          if (raw.joy && typeof raw.joy === "object") out.joy = raw.joy;
         } else if (raw.mom || raw.dad) {
           // short-lived role format: mom's checkmarks carry over
           if (raw.mom && typeof raw.mom === "object") out.mom = raw.mom;
@@ -127,7 +145,14 @@ function loadLocal() {
     localStorage.setItem("bfd_start", start);
   }
   var diff = Math.floor((Date.now() - new Date(start + "T12:00:00").getTime()) / 86400000);
-  state.day = Math.min(TOTAL_DAYS, Math.max(1, diff + 1));
+  var calendarDay = Math.min(TOTAL_DAYS, Math.max(1, diff + 1));
+  try { state.dayByJourney = JSON.parse(localStorage.getItem("bfd_day_by_journey") || "{}") || {}; } catch (e) { state.dayByJourney = {}; }
+  ["mom", "family", "us"].forEach(function (j) {
+    if (!state.dayByJourney[j]) state.dayByJourney[j] = calendarDay;
+  });
+  if (!state.dayByJourney.joy) state.dayByJourney.joy = 1;
+  if (!JOURNEY_TOTAL[state.journey]) state.journey = "mom";
+  state.day = Math.min(journeyTotal(), Math.max(1, state.dayByJourney[state.journey] || 1));
 }
 
 var sb = null;
@@ -143,14 +168,21 @@ function $(id) { return document.getElementById(id); }
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-/* journey content loads on demand: DEVOTIONALS_MOM / DEVOTIONALS_FAMILY */
-function journeyVar() { return state.journey === "family" ? "DEVOTIONALS_FAMILY" : "DEVOTIONALS_MOM"; }
-function journeyFile() { return state.journey === "family" ? "devotionals-family.js" : "devotionals-mom.js"; }
+/* journey content loads on demand: DEVOTIONALS_MOM / DEVOTIONALS_FAMILY / DEVOTIONALS_US / DEVOTIONALS_JOY */
+function journeyVar() { return state.journey === "family" ? "DEVOTIONALS_FAMILY" : state.journey === "us" ? "DEVOTIONALS_US" : state.journey === "joy" ? "DEVOTIONALS_JOY" : "DEVOTIONALS_MOM"; }
+function journeyFile() { return state.journey === "family" ? "devotionals-family.js" : state.journey === "us" ? "devotionals-us.js" : state.journey === "joy" ? "devotionals-joy.js" : "devotionals-mom.js"; }
+// Reveal the "For us" button only once its content file exists on the server.
+(function () {
+  var s = document.createElement("script");
+  s.src = "devotionals-us.js?v=1";
+  s.onload = function () { var b = document.getElementById("journeyUsBtn"); if (b) b.hidden = false; };
+  document.head.appendChild(s);
+})();
 function ensureJourneyLoaded() {
   return new Promise(function (resolve) {
     if (window[journeyVar()]) { resolve(); return; }
     var s = document.createElement("script");
-    s.src = journeyFile() + "?v=7";
+    s.src = journeyFile() + "?v=8";
     s.onload = function () { resolve(); };
     s.onerror = function () { resolve(); };
     document.head.appendChild(s);
@@ -205,13 +237,20 @@ function renderChrome() {
   document.querySelector(".langtoggle").setAttribute("aria-label", t("langLabel"));
   $("journeyMomBtn").textContent = t("journeyMom");
   $("journeyFamilyBtn").textContent = t("journeyFamily");
+  $("journeyUsBtn").textContent = t("journeyUs");
+  $("journeyJoyBtn").textContent = t("journeyJoy");
+  $("readingHeading").textContent = t("readMore");
   document.querySelectorAll(".journeytoggle button").forEach(function (b) {
     b.classList.toggle("active", b.dataset.journey === state.journey);
   });
   // header: bilingual lockup in "both" mode, single language otherwise
   $("appKicker").style.display = both ? "" : "none";
   $("appTitle").textContent = both ? "Devocional para la Familia" : t("appTitle");
-  $("appSub").textContent = both ? "365 days · 365 días · English + Español" : t("appSub");
+  if (state.journey === "joy") {
+    $("appSub").textContent = both ? "30 days of joy in the Lord · 30 días de gozo en el Señor" : t("joySub");
+  } else {
+    $("appSub").textContent = both ? "365 days · 365 días · English + Español" : t("appSub");
+  }
   document.title = both ? "Blended Family Devotional | Devocional para la Familia" : t("appTitle");
   document.documentElement.lang = state.lang === "es" ? "es" : "en";
   document.querySelectorAll(".langtoggle button").forEach(function (b) {
@@ -239,6 +278,7 @@ function renderStreak() {
 function renderDay() {
   var d = dev(state.day);
   if (!d) { $("devTitle").textContent = "Loading..."; return; }
+  saveLocal();
   var both = state.lang === "both";
 
   $("dayNum").textContent = t("dayNum") + " " + d.day;
@@ -279,6 +319,14 @@ function renderDay() {
   $("reflectText").textContent = both ? d.reflection_en + " / " + d.reflection_es : pick(d, "reflection");
   $("prayerText").textContent = both ? d.prayer_en + " / " + d.prayer_es : pick(d, "prayer");
 
+  var rb = $("readingBox");
+  if (d.reading_en) {
+    rb.classList.remove("hidden");
+    $("readingText").textContent = both ? d.reading_en + " / " + d.reading_es : pick(d, "reading");
+  } else {
+    rb.classList.add("hidden");
+  }
+
   var na = $("notesArea");
   na.value = journeyNotes()[d.day] || "";
   $("noteSaved").textContent = "";
@@ -293,17 +341,20 @@ function renderDay() {
   fb.classList.toggle("faved", !!journeyFav()[d.day]);
 
   $("prevBtn").disabled = d.day <= 1;
-  $("nextBtn").disabled = d.day >= TOTAL_DAYS;
+  $("nextBtn").disabled = d.day >= journeyTotal();
 }
 
 function renderMonths() {
   var box = $("monthBlocks");
   box.innerHTML = "";
-  MONTHS.forEach(function (m, mi) {
+  var blocks = state.journey === "joy" ? JOY_WEEKS : MONTHS;
+  blocks.forEach(function (m, mi) {
     var block = document.createElement("div");
     block.className = "month-block";
     var h = document.createElement("h3");
-    if (state.lang === "both") {
+    if (state.journey === "joy") {
+      h.textContent = state.lang === "es" ? m.es : state.lang === "both" ? m.en + " · " + m.es : m.en;
+    } else if (state.lang === "both") {
       h.innerHTML = "<b>Month · Mes " + (mi + 1) + "</b> · " +
         esc(m.en) + " · " + esc(m.es);
     } else {
@@ -470,7 +521,7 @@ async function cloudPushNote(day) {
 async function cloudPushAll() {
   if (!sb || !state.user) return;
   var rows = [], frows = [], nrows = [];
-  ["mom", "family"].forEach(function (j) {
+  ["mom", "family", "us", "joy"].forEach(function (j) {
     Object.keys((state.done[j] || {})).forEach(function (d) {
       rows.push({ user_id: state.user.id, day: Number(d), journey: j });
     });
@@ -615,14 +666,17 @@ document.querySelectorAll(".bottomnav button").forEach(function (b) {
   b.onclick = function () { showView(b.dataset.view); };
 });
 
-$("prevBtn").onclick = function () { if (state.day > 1) { state.day--; renderDay(); window.scrollTo(0, 0); } };
-$("nextBtn").onclick = function () { if (state.day < TOTAL_DAYS) { state.day++; renderDay(); window.scrollTo(0, 0); } };
+$("prevBtn").onclick = function () { if (state.day > 1) { state.day--; saveLocal(); renderDay(); window.scrollTo(0, 0); } };
+$("nextBtn").onclick = function () { if (state.day < journeyTotal()) { state.day++; saveLocal(); renderDay(); window.scrollTo(0, 0); } };
 
 document.querySelectorAll(".journeytoggle button").forEach(function (b) {
   b.onclick = function () {
     if (state.journey === b.dataset.journey) return;
+    state.dayByJourney[state.journey] = state.day;
     state.journey = b.dataset.journey;
     localStorage.setItem("bfd_journey", state.journey);
+    localStorage.setItem("bfd_day_by_journey", JSON.stringify(state.dayByJourney));
+    state.day = Math.min(journeyTotal(), Math.max(1, state.dayByJourney[state.journey] || 1));
     renderChrome();
     ensureJourneyLoaded().then(function () {
       renderStreak(); showView(state.view); window.scrollTo(0, 0);
